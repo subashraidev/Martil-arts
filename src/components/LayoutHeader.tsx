@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, X, Shield, LogOut, LayoutDashboard, User } from "lucide-react";
+import { Menu, X, LogOut, LayoutDashboard, User } from "lucide-react";
 
 interface UserSession {
   id: number;
@@ -20,6 +20,7 @@ export default function LayoutHeader() {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<UserSession | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [moreOpen, setMoreOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
 
@@ -54,17 +55,22 @@ export default function LayoutHeader() {
     }
   };
 
-  const navLinks = [
+  const mainLinks = [
     { name: "Programs", href: "/programs" },
     { name: "Schedule", href: "/schedule" },
-    { name: "Belt Progression", href: "/belt-progression" },
     { name: "Instructors", href: "/instructors" },
-    { name: "Events", href: "/events" },
     { name: "Gallery", href: "/gallery" },
+  ];
+
+  const moreLinks = [
+    { name: "Belt Progression", href: "/belt-progression" },
+    { name: "Events", href: "/events" },
     { name: "Blog", href: "/blog" },
     { name: "FAQ", href: "/faq" },
     { name: "Contact", href: "/contact" },
   ];
+
+  const allLinks = [...mainLinks, ...moreLinks];
 
   const getDashboardUrl = (role: string) => {
     if (role === "ADMIN") return "/dashboard/admin";
@@ -86,8 +92,8 @@ export default function LayoutHeader() {
           </div>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden lg:flex space-x-6 xl:space-x-8 text-sm font-medium">
-            {navLinks.map((link) => {
+          <nav className="hidden lg:flex items-center space-x-6 xl:space-x-8 text-sm font-medium">
+            {mainLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
                 <Link
@@ -101,10 +107,63 @@ export default function LayoutHeader() {
                 </Link>
               );
             })}
+
+            {/* "More" Dropdown Menu */}
+            <div
+              className="relative"
+              onMouseEnter={() => setMoreOpen(true)}
+              onMouseLeave={() => setMoreOpen(false)}
+            >
+              <button
+                onClick={() => setMoreOpen(!moreOpen)}
+                className={`flex items-center gap-1.5 transition-colors duration-200 hover:text-accent-gold cursor-pointer text-slate-300 ${
+                  moreLinks.some((l) => pathname === l.href) ? "text-accent-gold font-bold" : ""
+                }`}
+              >
+                <span>More</span>
+                <svg
+                  className={`h-3.5 w-3.5 transition-transform duration-200 ${
+                    moreOpen ? "rotate-180" : ""
+                  }`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+
+              {moreOpen && (
+                <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-52 rounded-2xl bg-slate-900 border border-slate-800 text-white shadow-2xl py-2 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                  {moreLinks.map((link) => {
+                    const isActive = pathname === link.href;
+                    return (
+                      <Link
+                        key={link.name}
+                        href={link.href}
+                        onClick={() => setMoreOpen(false)}
+                        className={`block px-4 py-2.5 text-xs font-bold hover:bg-slate-800 hover:text-accent-gold transition-colors ${
+                          isActive
+                            ? "text-accent-gold font-black bg-slate-800/40"
+                            : "text-slate-300"
+                        }`}
+                      >
+                        {link.name}
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </nav>
 
           {/* Action Buttons & Profile */}
-          <div className="hidden lg:flex items-center space-x-4">
+          <div className="hidden lg:flex items-center space-x-6">
             {user ? (
               <div className="relative">
                 <button
@@ -147,21 +206,15 @@ export default function LayoutHeader() {
               <>
                 <Link
                   href="/login"
-                  className="text-sm font-medium hover:text-accent-gold transition-colors duration-200"
+                  className="text-sm font-bold text-slate-300 hover:text-white transition-colors duration-200"
                 >
                   Login
                 </Link>
                 <Link
                   href="/try-free"
-                  className="bg-slate-800 hover:bg-slate-700 border border-slate-700 px-4 py-2.5 rounded-full text-sm font-semibold transition-all duration-200"
+                  className="bg-martial-red hover:bg-red-700 px-6 py-3 rounded-full text-xs font-black uppercase tracking-wider shadow-lg shadow-red-950/25 transition-all duration-200 animate-pulse-gold text-white"
                 >
-                  Try Free
-                </Link>
-                <Link
-                  href="/join"
-                  className="bg-martial-red hover:bg-red-700 px-4 py-2.5 rounded-full text-sm font-semibold shadow-lg shadow-red-950/20 transition-all duration-200 animate-pulse-gold"
-                >
-                  Join Class
+                  Book Free Trial
                 </Link>
               </>
             )}
@@ -192,7 +245,7 @@ export default function LayoutHeader() {
       {isOpen && (
         <div className="lg:hidden border-t border-slate-800 bg-primary-navy py-4 px-4 space-y-3">
           <div className="space-y-1">
-            {navLinks.map((link) => {
+            {allLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
                 <Link
@@ -208,9 +261,9 @@ export default function LayoutHeader() {
               );
             })}
           </div>
-          
+
           <hr className="border-slate-800" />
-          
+
           <div className="space-y-2 pt-2">
             {user ? (
               <>
@@ -249,16 +302,9 @@ export default function LayoutHeader() {
                   <Link
                     href="/try-free"
                     onClick={() => setIsOpen(false)}
-                    className="flex items-center justify-center border border-slate-700 hover:bg-slate-800 py-3 rounded-full text-base font-semibold text-center"
+                    className="flex items-center justify-center bg-martial-red hover:bg-red-700 py-3.5 rounded-full text-sm font-bold text-center col-span-2 text-white"
                   >
-                    Try Free
-                  </Link>
-                  <Link
-                    href="/join"
-                    onClick={() => setIsOpen(false)}
-                    className="flex items-center justify-center bg-martial-red hover:bg-red-700 py-3 rounded-full text-base font-semibold text-center"
-                  >
-                    Join Class
+                    Book Free Trial
                   </Link>
                 </div>
               </>
