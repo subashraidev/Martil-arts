@@ -1,0 +1,186 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id                  Int            @id @default(autoincrement())
+  email               String         @unique
+  password            String
+  role                String         @default("STUDENT") // ADMIN, INSTRUCTOR, STUDENT
+  createdAt           DateTime       @default(now())
+  profile             Profile?
+  classesAsInstructor Class[]
+  payments            Payment[]
+  blogPosts           BlogPost[]
+  announcements       Announcement[]
+}
+
+model Profile {
+  id                     Int            @id @default(autoincrement())
+  userId                 Int            @unique
+  user                   User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  firstName              String
+  lastName               String
+  parentName             String?
+  dob                    String
+  age                    Int
+  gender                 String
+  phone                  String
+  address                String
+  emergencyContact       String
+  medicalInfo            String?
+  currentBelt            String         @default("White")
+  beltProgressPercentage Int            @default(0)
+  membershipStatus       String         @default("Active") // Active, Suspended, Expired
+  membershipType         String         @default("Monthly") // Monthly, Quarterly, Semi-Annual, Annual, Family
+  preferredSchedule      String?
+  createdAt              DateTime       @default(now())
+  attendance             Attendance[]
+  beltProgressions       BeltProgress[]
+  enrollments            Enrollment[]
+}
+
+model Program {
+  id             Int          @id @default(autoincrement())
+  name           String
+  description    String
+  ageGroup       String
+  benefits       String // text
+  schedule       String
+  instructorName String
+  pricing        Float
+  slug           String       @unique
+  classes        Class[]
+  enrollments    Enrollment[]
+}
+
+model Class {
+  id           Int          @id @default(autoincrement())
+  programId    Int
+  program      Program      @relation(fields: [programId], references: [id])
+  name         String
+  dayOfWeek    String // Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Sunday
+  startTime    String // e.g. "16:30"
+  endTime      String // e.g. "17:30"
+  capacity     Int          @default(20)
+  instructorId Int?
+  instructor   User?        @relation(fields: [instructorId], references: [id])
+  attendance   Attendance[]
+}
+
+model Enrollment {
+  id        Int      @id @default(autoincrement())
+  profileId Int
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  programId Int
+  program   Program  @relation(fields: [programId], references: [id])
+  startDate DateTime @default(now())
+  status    String   @default("Active")
+}
+
+model Attendance {
+  id        Int      @id @default(autoincrement())
+  profileId Int
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  classId   Int
+  class     Class    @relation(fields: [classId], references: [id])
+  date      String // YYYY-MM-DD
+  status    String // Present, Absent, Late
+  createdAt DateTime @default(now())
+}
+
+model BeltProgress {
+  id                  Int       @id @default(autoincrement())
+  profileId           Int
+  profile             Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  beltColor           String // White, Yellow, Orange, Green, Blue, Purple, Brown, Red, Black, etc.
+  level               String // Beginner, Intermediate, Advanced, Black Belt
+  status              String    @default("In Progress") // In Progress, Pending Approval, Completed
+  skillsChecked       String // JSON string of checked requirements
+  poomsaeForm         String
+  sparringRating      String?
+  boardBreakingRating String?
+  instructorNotes     String?
+  promotedAt          DateTime?
+  certificateUrl      String?
+}
+
+model Payment {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id])
+  amount        Float
+  date          String // YYYY-MM-DD
+  method        String // Stripe, PayPal, Cash, Credit Card
+  status        String // Paid, Refunded, Pending
+  invoiceNumber String   @unique // TKD-YYYY-XXXX
+  description   String
+  createdAt     DateTime @default(now())
+}
+
+model TrialRequest {
+  id                   Int      @id @default(autoincrement())
+  name                 String
+  age                  Int
+  parentName           String?
+  phone                String
+  email                String
+  preferredDate        String // YYYY-MM-DD
+  preferredTime        String
+  experience           String
+  notes                String?
+  status               String   @default("Pending") // Pending, Completed, FollowedUp
+  assignedInstructorId Int?
+  createdAt            DateTime @default(now())
+}
+
+model ContactMessage {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  phone     String?
+  subject   String?
+  message   String
+  status    String   @default("Unread") // Unread, Read, Replied
+  createdAt DateTime @default(now())
+}
+
+model BlogPost {
+  id        Int      @id @default(autoincrement())
+  title     String
+  slug      String   @unique
+  content   String
+  summary   String
+  category  String
+  tags      String // comma separated
+  image     String
+  authorId  Int
+  author    User     @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model GalleryItem {
+  id        Int      @id @default(autoincrement())
+  url       String
+  type      String   @default("image") // image, video
+  album     String // Belt Promotion, Tournaments, Classes
+  title     String?
+  createdAt DateTime @default(now())
+}
+
+model Announcement {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  target    String   @default("all") // all, students, instructors
+  authorId  Int
+  author    User     @relation(fields: [authorId], references: [id])
+  createdAt DateTime @default(now())
+}
