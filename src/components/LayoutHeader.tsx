@@ -243,71 +243,143 @@ export default function LayoutHeader() {
 
       {/* Mobile Menu */}
       {isOpen && (
-        <div className="lg:hidden border-t border-slate-800 bg-primary-navy py-4 px-4 space-y-3">
-          <div className="space-y-1">
-            {allLinks.map((link) => {
-              const isActive = pathname === link.href;
-              return (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  onClick={() => setIsOpen(false)}
-                  className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-150 hover:bg-slate-800 hover:text-white ${
-                    isActive ? "text-accent-gold bg-slate-800 font-bold" : "text-slate-300"
-                  }`}
-                >
-                  {link.name}
-                </Link>
-              );
-            })}
+        <div className="lg:hidden border-t border-slate-800 bg-slate-950 text-white min-h-[calc(100vh-5rem)] overflow-y-auto py-8 px-6 space-y-8 animate-in slide-in-from-top duration-300">
+          
+          {/* Section 1: Main Training Links */}
+          <div className="space-y-3">
+            <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">Academy & Training</h4>
+            <div className="grid grid-cols-2 gap-3">
+              <Link
+                href="/programs"
+                onClick={() => setIsOpen(false)}
+                className="bg-slate-900 border border-slate-800 hover:bg-slate-850 p-4 rounded-2xl flex flex-col justify-between h-24 transition-all"
+              >
+                <span className="text-xl">🥋</span>
+                <span className="text-sm font-bold text-white">Programs</span>
+              </Link>
+              <Link
+                href="/schedule"
+                onClick={() => setIsOpen(false)}
+                className="bg-slate-900 border border-slate-800 hover:bg-slate-850 p-4 rounded-2xl flex flex-col justify-between h-24 transition-all"
+              >
+                <span className="text-xl">📅</span>
+                <span className="text-sm font-bold text-white">Schedule</span>
+              </Link>
+              <Link
+                href="/instructors"
+                onClick={() => setIsOpen(false)}
+                className="bg-slate-900 border border-slate-800 hover:bg-slate-850 p-4 rounded-2xl flex flex-col justify-between h-24 transition-all"
+              >
+                <span className="text-xl">👥</span>
+                <span className="text-sm font-bold text-white">Instructors</span>
+              </Link>
+              <Link
+                href="/belt-progression"
+                onClick={() => setIsOpen(false)}
+                className="bg-slate-900 border border-slate-800 hover:bg-slate-850 p-4 rounded-2xl flex flex-col justify-between h-24 transition-all"
+              >
+                <span className="text-xl">🏆</span>
+                <span className="text-sm font-bold text-white">Belt System</span>
+              </Link>
+            </div>
           </div>
 
-          <hr className="border-slate-800" />
+          {/* Section 2: Secondary Links */}
+          <div className="space-y-3">
+            <h4 className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-1">Information</h4>
+            <div className="bg-slate-900/40 border border-slate-900 rounded-3xl divide-y divide-slate-900 overflow-hidden">
+              <Link
+                href="/gallery"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center justify-between px-5 py-4 hover:bg-slate-800/40 text-slate-300 text-sm font-semibold transition-colors"
+              >
+                <span>Gallery</span>
+                <span className="text-slate-500">→</span>
+              </Link>
+              <Link
+                href="/events"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center justify-between px-5 py-4 hover:bg-slate-800/40 text-slate-300 text-sm font-semibold transition-colors"
+              >
+                <span>Events</span>
+                <span className="text-slate-500">→</span>
+              </Link>
+              <Link
+                href="/blog"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center justify-between px-5 py-4 hover:bg-slate-800/40 text-slate-300 text-sm font-semibold transition-colors"
+              >
+                <span>Academy Blog</span>
+                <span className="text-slate-500">→</span>
+              </Link>
+              <Link
+                href="/faq"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center justify-between px-5 py-4 hover:bg-slate-800/40 text-slate-300 text-sm font-semibold transition-colors"
+              >
+                <span>FAQ</span>
+                <span className="text-slate-500">→</span>
+              </Link>
+              <Link
+                href="/contact"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center justify-between px-5 py-4 hover:bg-slate-800/40 text-slate-300 text-sm font-semibold transition-colors"
+              >
+                <span>Contact Us</span>
+                <span className="text-slate-500">→</span>
+              </Link>
+            </div>
+          </div>
 
-          <div className="space-y-2 pt-2">
+          {/* Section 3: Auth & Portal */}
+          <div className="pt-2 border-t border-slate-900">
             {user ? (
-              <>
-                <div className="px-3 py-2 text-sm text-slate-400">
-                  Logged in as <strong className="text-white">{user.email}</strong>
+              <div className="bg-slate-900 border border-slate-800 rounded-3xl p-5 space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-accent-gold text-slate-900 flex items-center justify-center font-black text-sm">
+                    {user.profile?.firstName.substring(0, 1)}
+                  </div>
+                  <div>
+                    <h5 className="font-bold text-sm text-white">{user.profile?.firstName} {user.profile?.lastName}</h5>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">{user.role} Portal</span>
+                  </div>
                 </div>
-                <Link
-                  href={getDashboardUrl(user.role)}
-                  onClick={() => setIsOpen(false)}
-                  className="w-full flex items-center justify-center space-x-2 bg-slate-800 hover:bg-slate-700 py-3 rounded-full text-base font-semibold"
-                >
-                  <LayoutDashboard className="h-5 w-5 text-accent-gold" />
-                  <span>Go to Dashboard</span>
-                </Link>
-                <button
-                  onClick={() => {
-                    setIsOpen(false);
-                    handleLogout();
-                  }}
-                  className="w-full flex items-center justify-center space-x-2 bg-red-950/40 border border-red-900/50 hover:bg-red-900/50 text-red-300 py-3 rounded-full text-base font-semibold"
-                >
-                  <LogOut className="h-5 w-5" />
-                  <span>Sign Out</span>
-                </button>
-              </>
+                <div className="grid grid-cols-2 gap-3 pt-2">
+                  <Link
+                    href={getDashboardUrl(user.role)}
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center justify-center bg-slate-800 hover:bg-slate-700 py-3 rounded-full text-xs font-bold text-center"
+                  >
+                    My Dashboard
+                  </Link>
+                  <button
+                    onClick={() => {
+                      setIsOpen(false);
+                      handleLogout();
+                    }}
+                    className="flex items-center justify-center bg-red-950/40 border border-red-900/50 hover:bg-red-900/50 text-red-400 py-3 rounded-full text-xs font-bold text-center"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              </div>
             ) : (
-              <>
+              <div className="space-y-4">
+                <Link
+                  href="/try-free"
+                  onClick={() => setIsOpen(false)}
+                  className="w-full flex items-center justify-center bg-martial-red hover:bg-red-700 text-white font-bold py-4 rounded-full text-sm shadow-lg shadow-red-950/20"
+                >
+                  🥋 Book Free Trial Class
+                </Link>
                 <Link
                   href="/login"
                   onClick={() => setIsOpen(false)}
-                  className="w-full flex items-center justify-center bg-slate-800 hover:bg-slate-700 py-3 rounded-full text-base font-semibold"
+                  className="w-full flex items-center justify-center bg-slate-900 border border-slate-800 hover:bg-slate-850 text-slate-300 font-bold py-4 rounded-full text-sm"
                 >
-                  Login
+                  Sign In to Student Portal
                 </Link>
-                <div className="grid grid-cols-2 gap-3">
-                  <Link
-                    href="/try-free"
-                    onClick={() => setIsOpen(false)}
-                    className="flex items-center justify-center bg-martial-red hover:bg-red-700 py-3.5 rounded-full text-sm font-bold text-center col-span-2 text-white"
-                  >
-                    Book Free Trial
-                  </Link>
-                </div>
-              </>
+              </div>
             )}
           </div>
         </div>
